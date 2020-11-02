@@ -3,7 +3,7 @@
 const db = require("../db");
 const express = require("express");
 const router = express.Router();
-
+const slugify = require('slugify')
 
 /**  Get  companies */
 
@@ -56,13 +56,14 @@ router.post("/", async function (req, res, next) {
 
 router.patch("/:code", async function (req, res, next) {
   try {
-    const { code, name, description } = req.body;
+    const { name, description } = req.body;
+    let code = slugify(name)
 
     const result = await db.query(
           `UPDATE companies SET name=$1, description=$2
            WHERE code = $3
            RETURNING code, name, description`,
-        [name, description, req.params.code]
+        [code,name, description]
     );
 
     return res.json(result.rows[0]);
